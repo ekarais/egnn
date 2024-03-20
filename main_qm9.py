@@ -96,7 +96,8 @@ model = EGNN(
     attention=args.attention,
     node_attr=args.node_attr,
 )
-
+num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+print(f"Number of parameters: {num_params}")
 print(model)
 
 optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
