@@ -4,7 +4,7 @@ import json
 import torch
 import wandb
 from torch import nn, optim
-
+import time
 import utils
 from qm9 import dataset
 from qm9 import utils as qm9_utils
@@ -171,14 +171,18 @@ if __name__ == "__main__":
     wandb.config.update(vars(args))
 
     for epoch in range(0, args.epochs):
+        epoch_start_time = time.time()
         train_loss = train(epoch, dataloaders["train"], partition="train")
         val_loss = train(epoch, dataloaders["valid"], partition="valid")
         test_loss = train(epoch, dataloaders["test"], partition="test")
+        epoch_end_time = time.time()  # End timing the epoch
+        epoch_duration = epoch_end_time - epoch_start_time  # Calculate the duration
         wandb.log(
             {
                 "Train MAE": train_loss,
                 "Validation MAE": val_loss,
                 "Test MAE": test_loss,
+                "Epoch Duration": epoch_duration
             }
         )
         res["epochs"].append(epoch)
