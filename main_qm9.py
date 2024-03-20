@@ -2,6 +2,7 @@ import argparse
 import json
 
 import torch
+import wandb
 from torch import nn, optim
 
 import utils
@@ -165,24 +166,33 @@ def train(epoch, loader, partition="train"):
 
 if __name__ == "__main__":
     res = {"epochs": [], "losess": [], "best_val": 1e10, "best_test": 1e10, "best_epoch": 0}
+    # Setup wandb
+    wandb.init(entity="ten-harvard", project=f"QM9-{args.property}")
+    wandb.config.update(vars(args))
 
     for epoch in range(0, args.epochs):
-        train(epoch, dataloaders["train"], partition="train")
-        if epoch % args.test_interval == 0:
-            val_loss = train(epoch, dataloaders["valid"], partition="valid")
-            test_loss = train(epoch, dataloaders["test"], partition="test")
-            res["epochs"].append(epoch)
-            res["losess"].append(test_loss)
+        train_loss = train(epoch, dataloaders["train"], partition="train")
+        val_loss = train(epoch, dataloaders["valid"], partition="valid")
+        test_loss = train(epoch, dataloaders["test"], partition="test")
+        wandb.log(
+            {
+                "Train MAE": train_loss,
+                "Validation MAE": val_loss,
+                "Test MAE": test_loss,
+            }
+        )
+        res["epochs"].append(epoch)
+        res["losess"].append(test_loss)
 
-            if val_loss < res["best_val"]:
-                res["best_val"] = val_loss
-                res["best_test"] = test_loss
-                res["best_epoch"] = epoch
-            print("Val loss: %.4f \t test loss: %.4f \t epoch %d" % (val_loss, test_loss, epoch))
-            print(
-                "Best: val loss: %.4f \t test loss: %.4f \t epoch %d"
-                % (res["best_val"], res["best_test"], res["best_epoch"])
-            )
+        if val_loss < res["best_val"]:
+            res["best_val"] = val_loss
+            res["best_test"] = test_loss
+            res["best_epoch"] = epoch
+        print("Val loss: %.4f \t test loss: %.4f \t epoch %d" % (val_loss, test_loss, epoch))
+        print(
+            "Best: val loss: %.4f \t test loss: %.4f \t epoch %d"
+            % (res["best_val"], res["best_test"], res["best_epoch"])
+        )
 
         json_object = json.dumps(res, indent=4)
         with open(args.outf + "/" + args.exp_name + "/losess.json", "w") as outfile:
