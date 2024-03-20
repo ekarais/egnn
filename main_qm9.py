@@ -141,12 +141,11 @@ def train(epoch, loader, partition="train"):
         )
 
         if partition == "train":
-            loss = loss_l1(pred, (label - meann) / mad)
-            loss.backward()
+            train_loss = loss_l1(pred, (label - meann) / mad)
+            train_loss.backward()
             optimizer.step()
-        else:
-            loss = loss_l1(mad * pred + meann, label)
-
+        
+        loss = loss_l1(mad * pred + meann, label)
         res["loss"] += loss.item() * batch_size
         res["counter"] += batch_size
         res["loss_arr"].append(loss.item())
