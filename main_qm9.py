@@ -83,10 +83,6 @@ print(args)
 utils.makedir(args.outf)
 utils.makedir(args.outf + "/" + args.exp_name)
 
-dataloaders, charge_scale = dataset.retrieve_dataloaders(args.batch_size, args.num_workers)
-# compute mean and mean absolute deviation
-meann, mad = qm9_utils.compute_mean_mad(dataloaders, args.property)
-
 model = EGNN(
     in_node_nf=15,
     in_edge_nf=0,
@@ -100,6 +96,11 @@ model = EGNN(
 num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 print(f"Number of parameters: {num_params}")
 print(model)
+
+dataloaders, charge_scale = dataset.retrieve_dataloaders(args.batch_size, args.num_workers)
+# compute mean and mean absolute deviation
+meann, mad = qm9_utils.compute_mean_mad(dataloaders, args.property)
+
 
 optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs)
