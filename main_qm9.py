@@ -1,11 +1,12 @@
 import argparse
 import json
+import time
 
 import torch
-import wandb
 from torch import nn, optim
-import time
+
 import utils
+import wandb
 from qm9 import dataset
 from qm9 import utils as qm9_utils
 from qm9.models import EGNN
