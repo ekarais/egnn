@@ -147,7 +147,7 @@ def train(epoch, loader, partition="train"):
             train_loss = loss_l1(pred, (label - meann) / mad)
             train_loss.backward()
             optimizer.step()
-        
+
         loss = loss_l1(mad * pred + meann, label)
         res["loss"] += loss.item() * batch_size
         res["counter"] += batch_size
@@ -184,7 +184,8 @@ if __name__ == "__main__":
                 "Train MAE": train_loss,
                 "Validation MAE": val_loss,
                 "Test MAE": test_loss,
-                "Epoch Duration": epoch_duration
+                "Epoch Duration": epoch_duration,
+                "Learning Rate": lr_scheduler.get_last_lr()[0],
             }
         )
         res["epochs"].append(epoch)
