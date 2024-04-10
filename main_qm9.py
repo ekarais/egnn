@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 import time
 
 import torch
@@ -79,6 +80,16 @@ args.cuda = not args.no_cuda and torch.cuda.is_available()
 device = torch.device("cuda" if args.cuda else "cpu")
 dtype = torch.float32
 print(args)
+
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
+logging.debug("This is a debug message")
+logging.info("This is an info message")
+logging.warning("This is a warning message")
+logging.error("This is an error message")
+logging.critical("This is a critical message")
 
 utils.makedir(args.outf)
 utils.makedir(args.outf + "/" + args.exp_name)
